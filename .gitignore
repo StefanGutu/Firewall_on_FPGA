@@ -1,0 +1,5 @@
+check.c
+
+*.out
+*.exe
+*.o
