@@ -36,12 +36,6 @@ void close_rule_space(){
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-/*
-        TODO:   1. Trebuie o functie de primire din terminal a src ip, dst ip si port 
-                2. La port tre ca numarul sau sa aiba 1 la final ca sa determine codul verilog ca e valida combinatia
-                3. O functie care citeste regulile salvate sa ne asiguram ca merge tot ok
-    
-    */
 
 uint32_t bram_data_to_uint32(uint16_t port) {
     return ((uint32_t)1 << 31) | (uint32_t)port;
@@ -92,8 +86,8 @@ int write_rule(){
     if(bram_data.counter < 680){
         uint32_t offset = bram_data.counter * 3 ;
         bram_data.bram[offset ] = new_rule.dst_port;                            //1
-        bram_data.bram[offset + 1] = new_rule.src_ip;                           //3
-        bram_data.bram[offset + 2] = new_rule.dst_ip;                           //2        
+        bram_data.bram[offset + 1] = new_rule.dst_ip;                           //2        
+        bram_data.bram[offset + 2] = new_rule.src_ip;                           //3
 
     }else{
         printf("WARNING: BRAM is full you have 680 rule now");
@@ -112,9 +106,9 @@ int read_rules(){
         char string_dst_ip[INET_ADDRSTRLEN];
         char string_src_ip[INET_ADDRSTRLEN];
 
-        old_rule.dst_ip = bram_data.bram[offset ];
+        old_rule.src_ip = bram_data.bram[offset ];
         old_rule.dst_port = bram_data.bram[offset + 1];
-        old_rule.src_ip = bram_data.bram[offset + 2];
+        old_rule.dst_ip = bram_data.bram[offset + 2];
 
         inet_ntop(AF_INET, &old_rule.dst_ip, string_dst_ip, sizeof(string_dst_ip));        
         inet_ntop(AF_INET, &old_rule.src_ip, string_src_ip, sizeof(string_src_ip));

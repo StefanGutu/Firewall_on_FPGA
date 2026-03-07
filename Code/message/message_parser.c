@@ -267,8 +267,8 @@ int send_data_to_dma(dma_data_transfer data){
     dma_mm2s_sync(transfer_info.dma_vaddr);
     dma_s2mm_sync(transfer_info.dma_vaddr);
 
-    printf("RS: ");
-	print_mem(transfer_info.dma_dst_addr, 4);
+    // printf("RS: ");
+	// print_mem(transfer_info.dma_dst_addr, 4);
 
     return *transfer_info.dma_dst_addr;
 }

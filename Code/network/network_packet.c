@@ -246,16 +246,20 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     packet_info.data.src_ip = iph->saddr;
     packet_info.data.dst_ip = iph->daddr;
     packet_info.data.protocol = iph->protocol;
-    packet_info.data.dst_port = 0x00000001;
+    //TODO: Functie pt extragere port pe baza protocolului exista librarii in C pt TCP si UDP
+    packet_info.data.dst_port = 0x00000001;             //dummmy pt port    
     packet_info.data.message_id = counter_temp;
-    // // Aici decizi: NF_ACCEPT (1) sau NF_DROP (0)
-    uint32_t verdict = NF_ACCEPT;  // Lasă pachetul să treacă
-    
-    // // TODO: Adaugă logica ta de filtrare aici
-    // // Exemplu: if (block_this_packet(ip_packet, ip_len)) verdict = NF_DROP;
-    uint32_t result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
 
+    
+    
+    //TODO:logica de filtrare aici
+    uint32_t result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
     printf("RESULT FROM DMA: %d\n",result);
+    //NF_ACCEPT (1) NF_DROP (0)
+    uint32_t verdict = NF_DROP;
+    if(result == VALID_RESPONSE){
+        verdict = NF_ACCEPT;
+    }
     
     if(send_verdict(netlink_socket, packet_info.packet_id, verdict) < 0){
         printf("ERROR: Problem in atribute function send_verdict line\n");

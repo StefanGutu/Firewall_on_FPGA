@@ -22,9 +22,10 @@
 
 #include "../message/message_parser.h"
 
+#define MASK_FEEDBACK 0x3
+#define VALID_RESPONSE 0x3
 
 #define NLA_PAYLOAD(nla) ((int)((nla)->nla_len - NLA_HDRLEN))
-#define MASK_FEEDBACK 0x3
 typedef struct {
     dma_data_transfer data;
     uint32_t packet_id;
