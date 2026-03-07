@@ -2,7 +2,7 @@
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 //Partea unde initializez 
-
+int counter_temp = 0;
 
 //Functia configureaza cum se copie pachetele pt queue-ul respctiv
 int init_netlink_set_copy_mode(int sock, uint16_t queue_num, uint8_t mode, uint32_t range){
@@ -123,6 +123,8 @@ int init_netlink_socket(){
         close(netlink_socket);
         exit(EXIT_FAILURE);
     }
+
+    init_dma();
     return netlink_socket;
 }
 
@@ -192,24 +194,25 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
 
     struct nlattr *attribut = (struct nlattr *)((char *)netlink_pointer_to_data + sizeof(struct nfgenmsg));
 
-    uint32_t packet_id = 0;
-    unsigned char *ip_packet = NULL;
-    int ip_len = 0;
+    packet_info_t packet_info;
+    packet_info.packet_id = 0;
+    packet_info.ip_packet = NULL;
+    packet_info.ip_len = 0;
     
     while(nla_ok(attribut, attribut_length)){
         switch(attribut->nla_type){
             case NFQA_PACKET_HDR: {
                 //Extrage ID-ul pachetului (NECESAR pentru verdict!)
                 struct nfqnl_msg_packet_hdr *ph = (struct nfqnl_msg_packet_hdr *)nla_data(attribut);
-                packet_id = ntohl(ph->packet_id);
-                printf("Packet ID: %u\n", packet_id);
+                packet_info.packet_id = ntohl(ph->packet_id);
+                printf("Packet ID: %u\n", packet_info.packet_id);
                 break;
             }
             case NFQA_PAYLOAD: {
                 //Extrage payload-ul (pachetul IP efectiv)
-                ip_packet = (unsigned char *)nla_data(attribut);
-                ip_len = NLA_PAYLOAD(attribut);
-                printf("Payload: %d bytes\n", ip_len);
+                packet_info.ip_packet = (unsigned char *)nla_data(attribut);
+                packet_info.ip_len = NLA_PAYLOAD(attribut);
+                printf("Payload: %d bytes\n", packet_info.ip_len);
                 break;
             }
             case NFQA_IFINDEX_INDEV: {
@@ -229,24 +232,37 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     }
 
 
-    if (packet_id == 0) {
+    if (packet_info.packet_id == 0) {
         printf("ERROR: Packet is 0\n");
         return;
     }
 
+    struct iphdr *iph = (struct iphdr *)packet_info.ip_packet;
+    //to check that evething is alright
+    printf("Source IP: %s\n", inet_ntoa(*(struct in_addr *)&iph->saddr));
+    printf("Destination IP: %s\n", inet_ntoa(*(struct in_addr *)&iph->daddr));
+    printf("Protocol: %u\n", iph->protocol);
+
+    packet_info.data.src_ip = iph->saddr;
+    packet_info.data.dst_ip = iph->daddr;
+    packet_info.data.protocol = iph->protocol;
+    packet_info.data.dst_port = 0x00000001;
+    packet_info.data.message_id = counter_temp;
     // // Aici decizi: NF_ACCEPT (1) sau NF_DROP (0)
     uint32_t verdict = NF_ACCEPT;  // Lasă pachetul să treacă
     
     // // TODO: Adaugă logica ta de filtrare aici
     // // Exemplu: if (block_this_packet(ip_packet, ip_len)) verdict = NF_DROP;
+    uint32_t result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
+
+    printf("RESULT FROM DMA: %d\n",result);
     
-    
-    if (send_verdict(netlink_socket, packet_id, verdict) < 0) {
+    if(send_verdict(netlink_socket, packet_info.packet_id, verdict) < 0){
         printf("ERROR: Problem in atribute function send_verdict line\n");
-    } else {
+    }else{
         printf("SUCCES: Verdict: %s\n", verdict == NF_ACCEPT ? "ACCEPT" : "DROP");
     }
-
+    counter_temp++;
 }
 
 

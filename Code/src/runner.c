@@ -1,22 +1,24 @@
 #include "../network/network_packet.h"
-// #include "../control/rule_maker.h"
+#include "../control/rule_maker.h"
 // #include "../message/message_parser.h"
 
 int main(){
-    int netlink_socket = init_netlink_socket();
-    recive_netlink_packet(netlink_socket);
 
+    //ex pt network
+    int netlink_socket = init_netlink_socket();
     while(1){
         recive_netlink_packet(netlink_socket);
         sleep(2);
     }
 
-
+    //ex pt rule maker
     // init_rule_space();
     // write_rule();
     // read_rules();
     // close_rule_space();
 
+
+    //ex pt message parser
     // dma_data_transfer data;
     // init_dma();
     // data.src_ip = 0x0101A8C0;

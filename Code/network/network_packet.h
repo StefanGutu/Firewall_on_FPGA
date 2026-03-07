@@ -11,21 +11,25 @@
 
 #include <sys/socket.h>
 #include <linux/netlink.h>
+#include <linux/ip.h> 
+#include <netinet/tcp.h>
+#include <netinet/udp.h>
 #include <fcntl.h> 
 
 #include <linux/netfilter.h>
 #include <linux/netfilter/nfnetlink.h>
 #include <linux/netfilter/nfnetlink_queue.h>
 
-#include "message_parser.h"
+#include "../message/message_parser.h"
 
 
 #define NLA_PAYLOAD(nla) ((int)((nla)->nla_len - NLA_HDRLEN))
-
+#define MASK_FEEDBACK 0x3
 typedef struct {
     dma_data_transfer data;
-    const unsigned char *payload;
-    uint16_t payload_len;
+    uint32_t packet_id;
+    uint16_t ip_len;
+    unsigned char *ip_packet;
 } packet_info_t;
 
 

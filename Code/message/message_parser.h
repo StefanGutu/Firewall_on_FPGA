@@ -50,6 +50,8 @@
 #define ENABLE_ERR_IRQ              0x00004000
 #define ENABLE_ALL_IRQ              0x00007000
 
+
+//this struct is used for DMA to be able to trasfer data to it
 typedef struct{
     unsigned int ddr_mem;
     unsigned int *dma_vaddr;
@@ -57,7 +59,7 @@ typedef struct{
     unsigned int *dma_dst_addr;
 }dma_util_transfer;
 
-
+//here is stored information about what we should send to DMA
 typedef struct{
     uint32_t src_ip;                                //+
     uint32_t dst_ip;                                //+
