@@ -24,6 +24,8 @@
 
 #define MASK_FEEDBACK 0x3
 #define VALID_RESPONSE 0x3
+#define QUEUE_INBOUND 1
+#define QUEUE_OUTBOUND 0
 
 #define NLA_PAYLOAD(nla) ((int)((nla)->nla_len - NLA_HDRLEN))
 typedef struct {

@@ -4,6 +4,7 @@
 //Partea unde initializez 
 int counter_temp = 0;
 
+
 //Functia configureaza cum se copie pachetele pt queue-ul respctiv
 int init_netlink_set_copy_mode(int sock, uint16_t queue_num, uint8_t mode, uint32_t range){
     netlink_data_set_copy_mode data;
@@ -81,8 +82,6 @@ int init_netlink_socket(){
         exit(EXIT_FAILURE);
     }
 
-    int queue_num = 0;
-
     struct sockaddr_nl addr;
     memset(&addr, 0, sizeof(addr));
     addr.nl_family = AF_NETLINK;       // familia Netlink
@@ -112,14 +111,28 @@ int init_netlink_socket(){
         exit(EXIT_FAILURE);
     }
 
+    //Pt ce vine de pe laptop
     //Bind la queue
-    if(init_netlink_config_pid_to_nfqueue(netlink_socket, queue_num, NFQNL_CFG_CMD_BIND, AF_UNSPEC) < 0){
+    if(init_netlink_config_pid_to_nfqueue(netlink_socket, QUEUE_OUTBOUND, NFQNL_CFG_CMD_BIND, AF_UNSPEC) < 0){
         close(netlink_socket);
         exit(EXIT_FAILURE);
     }
 
     //Setam modul de copiere
-    if (init_netlink_set_copy_mode(netlink_socket, queue_num, NFQNL_COPY_PACKET, 0xFFFF) < 0) {
+    if (init_netlink_set_copy_mode(netlink_socket, QUEUE_OUTBOUND, NFQNL_COPY_PACKET, 0xFFFF) < 0) {
+        close(netlink_socket);
+        exit(EXIT_FAILURE);
+    }
+
+    //Pt ce vine de pe internet
+    //Bind la queue
+    if(init_netlink_config_pid_to_nfqueue(netlink_socket, QUEUE_INBOUND, NFQNL_CFG_CMD_BIND, AF_UNSPEC) < 0){
+        close(netlink_socket);
+        exit(EXIT_FAILURE);
+    }
+
+    //Setam modul de copiere
+    if (init_netlink_set_copy_mode(netlink_socket, QUEUE_INBOUND, NFQNL_COPY_PACKET, 0xFFFF) < 0) {
         close(netlink_socket);
         exit(EXIT_FAILURE);
     }
@@ -131,7 +144,7 @@ int init_netlink_socket(){
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 //Partea unde trimit raspuns
 
-int send_verdict(int netlink_socket, uint32_t packet_id, uint32_t verdict){
+int send_verdict(int netlink_socket, uint32_t packet_id, uint32_t verdict, uint32_t queue_num){
     netlink_data_response_back data;
 
     memset(&data, 0, sizeof(netlink_data_response_back));
@@ -142,7 +155,7 @@ int send_verdict(int netlink_socket, uint32_t packet_id, uint32_t verdict){
 
     data.nfg.nfgen_family = AF_UNSPEC;
     data.nfg.version = NFNETLINK_V0;
-    data.nfg.res_id = htons(0);  // Queue 0
+    data.nfg.res_id = htons(queue_num);  // Queue 0
 
     data.nla.nla_type = NFQA_VERDICT_HDR;
     data.nla.nla_len = sizeof(data.nla) + sizeof(data.vh);
@@ -193,6 +206,8 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     int attribut_length = netlink_header->nlmsg_len - NLMSG_LENGTH(sizeof(struct nfgenmsg));    //nlmsg_len (Dim. Totala)  -  (header_netlink + nfgenmsg) = zona de atribute
 
     struct nlattr *attribut = (struct nlattr *)((char *)netlink_pointer_to_data + sizeof(struct nfgenmsg));
+
+    uint32_t queue_num = ntohs(netlink_pointer_to_data->res_id);
 
     packet_info_t packet_info;
     packet_info.packet_id = 0;
@@ -250,18 +265,24 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     packet_info.data.dst_port = 0x00000001;             //dummmy pt port    
     packet_info.data.message_id = counter_temp;
 
-    
+    uint32_t result;
     
     //TODO:logica de filtrare aici
-    uint32_t result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
-    printf("RESULT FROM DMA: %d\n",result);
+    if(queue_num == QUEUE_OUTBOUND){
+        result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
+        printf("RESULT FROM DMA: %d\n",result);
+    }else if(queue_num == QUEUE_INBOUND){
+        result = 3;
+        printf("RESULT FROM INTERNET: %d\n",result);
+    }
+
     //NF_ACCEPT (1) NF_DROP (0)
     uint32_t verdict = NF_DROP;
     if(result == VALID_RESPONSE){
         verdict = NF_ACCEPT;
     }
     
-    if(send_verdict(netlink_socket, packet_info.packet_id, verdict) < 0){
+    if(send_verdict(netlink_socket, packet_info.packet_id, verdict, queue_num) < 0){
         printf("ERROR: Problem in atribute function send_verdict line\n");
     }else{
         printf("SUCCES: Verdict: %s\n", verdict == NF_ACCEPT ? "ACCEPT" : "DROP");
