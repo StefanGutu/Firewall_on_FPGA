@@ -21,6 +21,7 @@
 #include <linux/netfilter/nfnetlink_queue.h>
 
 #include "../message/message_parser.h"
+#include "../spoofing/anti_spoofing.h"
 
 #define MASK_FEEDBACK 0x3
 #define VALID_RESPONSE 0x3

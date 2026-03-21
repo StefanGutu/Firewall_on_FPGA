@@ -141,9 +141,15 @@ int verfiy_ip(uint32_t ip_addr, uint32_t interface, int sock_rt){
         return -1;
     }
     
-    printf("DATA: %d\n", read_route_response(sock_rt));
+    // printf("DATA: %d\n", read_route_response(sock_rt));
+    int src_ip_interface = read_route_response(sock_rt);
 
-    return 0;
+    if(interface == src_ip_interface){
+        return 3;
+    }
+
+
+    return 2;
 }
 
 

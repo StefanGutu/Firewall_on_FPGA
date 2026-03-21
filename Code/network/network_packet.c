@@ -3,6 +3,7 @@
 //-------------------------------------------------------------------------------------------------------------------------------------------------------
 //Partea unde initializez 
 int counter_temp = 0;
+int socket_ip_spoofing = -1;
 
 
 //Functia configureaza cum se copie pachetele pt queue-ul respctiv
@@ -138,6 +139,7 @@ int init_netlink_socket(){
     }
 
     init_dma();
+    socket_ip_spoofing = init_anti_ip_spoofing();
     return netlink_socket;
 }
 
@@ -213,6 +215,9 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     packet_info.packet_id = 0;
     packet_info.ip_packet = NULL;
     packet_info.ip_len = 0;
+
+    uint32_t *in_ifindex;
+    uint32_t *out_ifindex;
     
     while(nla_ok(attribut, attribut_length)){
         switch(attribut->nla_type){
@@ -232,14 +237,14 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
             }
             case NFQA_IFINDEX_INDEV: {
                 //Interfata de intrare
-                uint32_t *ifindex = (uint32_t *)nla_data(attribut);
-                printf("Interface IN: %u\n", ntohl(*ifindex));
+                in_ifindex = (uint32_t *)nla_data(attribut);
+                printf("Interface IN: %u\n", ntohl(*in_ifindex));
                 break;
             }
             case NFQA_IFINDEX_OUTDEV: {
                 //Interfata de iesire
-                uint32_t *ifindex = (uint32_t *)nla_data(attribut);
-                printf("Interface OUT: %u\n", ntohl(*ifindex));
+                out_ifindex = (uint32_t *)nla_data(attribut);
+                printf("Interface OUT: %u\n", ntohl(*out_ifindex));
                 break;
             } 
         }
@@ -272,7 +277,7 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
         result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
         printf("RESULT FROM DMA: %d\n",result);
     }else if(queue_num == QUEUE_INBOUND){
-        result = 3;
+        result = verfiy_ip(packet_info.data.src_ip, ntohl(*in_ifindex), socket_ip_spoofing);
         printf("RESULT FROM INTERNET: %d\n",result);
     }
 
