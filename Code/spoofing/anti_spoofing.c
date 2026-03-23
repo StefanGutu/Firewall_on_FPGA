@@ -1,19 +1,5 @@
 #include "anti_spoofing.h"
 
-//TO DO 
-/*
-1.ARP spoofing 
-    Poti implemena un nou tread care verifica cererile arp si salvezi intr-un tabel informatiile [ip - mac]
-    In momentul in care acestea sau schimbat de prea multe ori poti determina ca e arp spoofing
-
-2.MAC spoofing (teoretic probabil fac doar ARP spoofing pt a reduce complexitatea)
-    Aici te poti folosi de tabelul ARP ca sa determini exact cam cui ar fi asociat combinatia [ip - mac]
-    Daca exista mai multe ip-ui cu acelasi mac inseamna ca e anomalie sau invers
-
-3.IP spoofing
-    Aici se fura ip-ul si tre sa determini cum te protejezi prin Reverse Path Forwarding
-
-*/
 
 int close_ip_spoofing(int sock_rt){
     if(close(sock_rt) == -1){
