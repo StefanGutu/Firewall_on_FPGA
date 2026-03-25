@@ -63,7 +63,7 @@ int write_rule(){
     rule_t new_rule;
     char line[LINE_SIZE];
 
-    printf("You wanted to add a new rule!\n");
+    // printf("You wanted to add a new rule!\n");
     write_line(line, "SRC_IP");
     if((inet_pton(AF_INET, line, &new_rule.src_ip)) != 1){
         printf("ERROR: Problem in inet_pton\n");

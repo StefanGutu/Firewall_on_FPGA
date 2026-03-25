@@ -53,8 +53,10 @@ typedef struct message_type{
     struct arp_header arp_payload;
 }__attribute__((packed)) message_type_t;
 
-int init_arp_inspect();                     //makes a socket and returns it's value to be able to use it later on
-int save_arp_table();
-int check_arp_table(int socket);
+int             init_arp_inspect();                     //makes a socket and returns it's value to be able to use it later on
+int             save_arp_table();
+int             check_arp_table(int socket);
+void            close_arp_inspect(int sock);
+
 
 #endif

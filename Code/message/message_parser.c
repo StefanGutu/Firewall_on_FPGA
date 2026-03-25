@@ -2,6 +2,12 @@
 
 dma_util_transfer transfer_info;
 
+void close_dma(){
+    munmap(transfer_info.dma_vaddr, 65535);
+    munmap(transfer_info.dma_src_addr, 65535);
+    munmap(transfer_info.dma_dst_addr, 65535);
+    close(transfer_info.ddr_mem);
+}
 
 void print_mem(void *virtual_address, int byte_count)
 {
@@ -35,7 +41,7 @@ void dma_s2mm_status(unsigned int *virtual_addr)
 {
     unsigned int status = read_dma(virtual_addr, S2MM_STATUS_REGISTER);
 
-    printf("Stream to memory-mapped status (0x%08x@0x%02x):", status, S2MM_STATUS_REGISTER);
+    // printf("Stream to memory-mapped status (0x%08x@0x%02x):", status, S2MM_STATUS_REGISTER);
 
     if (status & STATUS_HALTED) {
 		printf(" Halted.\n");
@@ -92,7 +98,7 @@ void dma_mm2s_status(unsigned int *virtual_addr)
 {
     unsigned int status = read_dma(virtual_addr, MM2S_STATUS_REGISTER);
 
-    printf("Memory-mapped to stream status (0x%08x@0x%02x):", status, MM2S_STATUS_REGISTER);
+    // printf("Memory-mapped to stream status (0x%08x@0x%02x):", status, MM2S_STATUS_REGISTER);
 
     if (status & STATUS_HALTED) {
 		printf(" Halted.\n");

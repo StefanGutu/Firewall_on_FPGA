@@ -69,7 +69,7 @@ int init_netlink_config_pid_to_nfqueue(int sock, uint16_t queue_num, uint8_t com
 
         return -1;
     }
-    printf("SUCCESS: Netlink config PID to NFQUEUE\n");
+    // printf("SUCCESS: Netlink config PID to NFQUEUE\n");
     return 0;
 }
 
@@ -97,7 +97,7 @@ int init_netlink_socket(){
         exit(EXIT_FAILURE);
     }
 
-    printf("SUCCESS: Netlink socket initialized (fd=%d)\n", netlink_socket);
+    // printf("SUCCESS: Netlink socket initialized (fd=%d)\n", netlink_socket);
 
 
     //Pt clean up 
@@ -259,9 +259,9 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
 
     struct iphdr *iph = (struct iphdr *)packet_info.ip_packet;
     //to check that evething is alright
-    printf("Source IP: %s\n", inet_ntoa(*(struct in_addr *)&iph->saddr));
-    printf("Destination IP: %s\n", inet_ntoa(*(struct in_addr *)&iph->daddr));
-    printf("Protocol: %u\n", iph->protocol);
+    // printf("Source IP: %s\n", inet_ntoa(*(struct in_addr *)&iph->saddr));
+    // printf("Destination IP: %s\n", inet_ntoa(*(struct in_addr *)&iph->daddr));
+    // printf("Protocol: %u\n", iph->protocol);
 
     packet_info.data.src_ip = iph->saddr;
     packet_info.data.dst_ip = iph->daddr;
@@ -344,4 +344,12 @@ void recive_netlink_packet(int netlink_socket){
 
         atribute_netlink_packet(netlink_socket, nlh, nfmsg);
     }
+}
+
+void close_netlink_socket(int sock){
+    //unbind queue
+    init_netlink_config_pid_to_nfqueue(sock, QUEUE_OUTBOUND, NFQNL_CFG_CMD_UNBIND, AF_UNSPEC);
+    init_netlink_config_pid_to_nfqueue(sock, QUEUE_INBOUND,  NFQNL_CFG_CMD_UNBIND, AF_UNSPEC);
+    init_netlink_config_pid_to_nfqueue(sock, 0, NFQNL_CFG_CMD_PF_UNBIND, AF_INET);
+    close(sock);
 }

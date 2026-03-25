@@ -71,8 +71,9 @@ typedef struct{
 }dma_data_transfer;
 
 
-int init_dma();
+int         init_dma();
 //will send the structure to dma to be checked in hardware for ip + port + protocol based on the rules in bram
-int send_data_to_dma(dma_data_transfer data);                  
+int         send_data_to_dma(dma_data_transfer data);                  
+void        close_dma();
 
 #endif

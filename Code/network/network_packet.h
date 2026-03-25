@@ -59,7 +59,7 @@ typedef struct {
 }netlink_data_response_back;
 
 int                         init_netlink_socket();                                                             //Init socket for  Netfilter connection between userspace and kernel
-void                        recive_netlink_packet();                                                           //Function to recive a packet 
-
+void                        recive_netlink_packet(int netlink_socket);                                         //Function to recive a packet 
+void                        close_netlink_socket(int sock);
 
 #endif

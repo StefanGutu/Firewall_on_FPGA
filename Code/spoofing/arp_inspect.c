@@ -7,6 +7,10 @@ uint8_t counter_arp_table;
 arp_elem_t black_list_arp_table[MAX_BLACK_LIST];
 uint8_t counter_black_list;
 
+void close_arp_inspect(int sock){
+    close(sock);
+}
+
 int init_arp_inspect(){
     struct sockaddr_ll saddr;
 
@@ -86,7 +90,7 @@ int save_arp_table(){
                 return -1;
             }
 
-            print_arp_struct(new_elem);
+            // print_arp_struct(new_elem);
         }
     }
 
@@ -126,11 +130,11 @@ int search_table(arp_elem_t new_elem){
             return ARP_DETECT_TRUST_BROKEN_IP;
         }
 
-        printf("\nTABLE: ");
-        print_arp_struct(arp_table[i]);
-        printf("ELEM: ");
-        print_arp_struct(new_elem);
-        printf("\n");
+        // printf("\nTABLE: ");
+        // print_arp_struct(arp_table[i]);
+        // printf("ELEM: ");
+        // print_arp_struct(new_elem);
+        // printf("\n");
     }
     return ARP_DETECT_NOTHING;
 }
@@ -163,28 +167,21 @@ int check_arp_table(int socket){
 
                 char cmd[128];
                 char ip_str[INET_ADDRSTRLEN];
-                char mac_str[18];
 
                 inet_ntop(AF_INET, &new_elem.ip, ip_str, sizeof(ip_str));
-                snprintf(cmd, sizeof(cmd), "iptables -A INPUT -s %s -j DROP", ip_str);
-                system(cmd);
-                printf("[SECURITY] IP: %s BLOCKED\n", ip_str);
+                snprintf(cmd, sizeof(cmd), "ebtables -A INPUT -p ARP --arp-ip-src %s -j DROP", ip_str);
+                int ret = system(cmd);
+                if(ret != 0){
+                    printf("ERROR: ebtables command failed with code %d\n", ret);
+                }
                 
-
-                inet_ntop(AF_INET, &new_elem.ip, ip_str, sizeof(ip_str));
-                snprintf(mac_str, sizeof(mac_str), "%02x:%02x:%02x:%02x:%02x:%02x",
-                        new_elem.mac[0], new_elem.mac[1], new_elem.mac[2],
-                        new_elem.mac[3], new_elem.mac[4], new_elem.mac[5]);
-
-                //ignore packets
-                snprintf(cmd, sizeof(cmd), "ip neigh replace %s lladdr %s dev enx0008dc010203 nud failed",ip_str, mac_str);
-                system(cmd);
-                printf("[SECURITY] Untrusted IP - MAC: %s | %s\n", ip_str, mac_str);
+                printf("[SECURITY] ARP BLOCKED FOR IP: %s\n", ip_str);
 
                 if(counter_black_list >= MAX_BLACK_LIST){
                     printf("ERROR: blacklist full\n");
                     return -1;
                 }
+                
                 black_list_arp_table[counter_black_list] = new_elem;
                 counter_black_list++;
             }
