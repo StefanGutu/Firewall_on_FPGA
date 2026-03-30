@@ -13,6 +13,9 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 
+#define IP_SPOOFED 0x4
+#define IP_NOT_SPOOFED 0x3
+
 typedef struct netlink_req{ 
     struct nlmsghdr nlh;  // Netlink header 
     struct rtmsg rtm;     // Payload 

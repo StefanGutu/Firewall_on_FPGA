@@ -47,23 +47,48 @@ static void *thread_arp_fn(void *arg){
     return NULL;
 }
 
+void *thread_websocket_fn(void *arg) {
+    struct lws_context *context = (struct lws_context *)arg;
+    while (1) {
+        lws_service(context, 50);
+    }
+
+    return NULL;
+}
+
 void run_system(){
     init_rule_space();
     netlink_socket = init_netlink_socket();
     arp_socket = init_arp_inspect();
     save_arp_table();
 
-    pthread_t t_network, t_control, t_arp;
+    struct lws_context *context = init_server();
+    if (!context) {
+        printf("Eroare init server\n");
+        return;
+    }
+
+    pthread_t t_network, t_control, t_websocket, t_arp;
 
     pthread_create(&t_network, NULL, thread_network_fn, NULL);
     pthread_create(&t_control, NULL, thread_control_fn, NULL);
+    pthread_create(&t_websocket, NULL, thread_websocket_fn, context);
     // pthread_create(&t_arp, NULL, thread_arp_fn, NULL);
 
     pthread_join(t_control, NULL);   
 
     pthread_cancel(t_network);
+    pthread_cancel(t_websocket);
     // pthread_cancel(t_arp);
 
+    pthread_join(t_network, NULL);
+    pthread_join(t_websocket, NULL);
+    // pthread_join(t_arp, NULL);
+
+    if (context) {
+        lws_context_destroy(context);
+        printf("Serverul a fost închis cu succes.\n");
+    }
 
     close_netlink_socket(netlink_socket);
     // close_arp_inspect(arp_socket);

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPGA Firewall Monitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <div class="shield">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z"/>
+            </svg>
+        </div>
+        <div>
+            <h1>FPGA FIREWALL</h1>
+            <p>NETWORK SECURITY MONITOR</p>
+        </div>
+    </div>
+    <div class="header-right">
+        <div class="dot-wrap">
+            <div class="dot" id="ws-dot"></div>
+            <span id="ws-status">DISCONNECTED</span>
+        </div>
+        <span id="clock">--:--:--</span>
+    </div>
+</header>
+
+<div class="ws-config">
+    <label>WS://</label>
+    <input type="text" id="ws-url" value="192.168.1.20:9000" placeholder="IP:PORT">
+    <button class="btn"         id="btn-connect"    onclick="connectWS()">CONNECT</button>
+    <button class="btn btn-red" id="btn-disconnect" onclick="disconnectWS()" style="display:none">DISCONNECT</button>
+    <button class="btn btn-dim"                     onclick="resetStats()">RESET</button>
+</div>
+
+<main>
+    <div class="stats-row">
+        <div class="stat-card">
+            <span class="stat-title">TOTAL BLOCKED</span>
+            <span class="stat-val" id="stat-total">0</span>
+        </div>
+        <div class="stat-card pkt-card">
+            <span class="stat-title">PACKET BLOCKED</span>
+            <span class="stat-val" id="stat-pkt">0</span>
+        </div>
+        <div class="stat-card ip-card">
+            <span class="stat-title">IP SPOOFING</span>
+            <span class="stat-val" id="stat-ip">0</span>
+        </div>
+        <div class="stat-card arp-card">
+            <span class="stat-title">ARP SPOOFING</span>
+            <span class="stat-val" id="stat-arp">0</span>
+        </div>
+    </div>
+
+    <div class="content-row">
+        <div class="chart-card">
+            <div class="card-header">
+                <span class="card-title">ATTACK DISTRIBUTION</span>
+                <span class="card-badge" id="total-badge">TOTAL: 0</span>
+            </div>
+            <div class="pie-wrap">
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+
+        <div class="log-card">
+            <div class="card-header">
+                <span class="card-title">SECURITY LOG</span>
+                <span class="card-badge" id="log-count">0 EVT</span>
+            </div>
+            <div class="log-body" id="log-body"></div>
+        </div>
+    </div>
+</main>
+
+<script src="main.js"></script>
+</body>
+</html>

@@ -131,11 +131,11 @@ int verfiy_ip(uint32_t ip_addr, uint32_t interface, int sock_rt){
     int src_ip_interface = read_route_response(sock_rt);
 
     if(interface == src_ip_interface){
-        return 3;
+        return IP_NOT_SPOOFED;
     }
 
 
-    return 2;
+    return IP_SPOOFED;
 }
 
 

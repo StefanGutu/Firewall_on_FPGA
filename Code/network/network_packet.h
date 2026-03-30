@@ -22,6 +22,7 @@
 
 #include "../message/message_parser.h"
 #include "../spoofing/anti_spoofing.h"
+#include "websocket_adpt.h"
 
 #define MASK_FEEDBACK 0x3
 #define VALID_RESPONSE 0x3

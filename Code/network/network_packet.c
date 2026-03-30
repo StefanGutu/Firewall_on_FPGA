@@ -206,7 +206,6 @@ void *nla_data(const struct nlattr *nla){
 */
 void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header,struct nfgenmsg *netlink_pointer_to_data){
     int attribut_length = netlink_header->nlmsg_len - NLMSG_LENGTH(sizeof(struct nfgenmsg));    //nlmsg_len (Dim. Totala)  -  (header_netlink + nfgenmsg) = zona de atribute
-
     struct nlattr *attribut = (struct nlattr *)((char *)netlink_pointer_to_data + sizeof(struct nfgenmsg));
 
     uint32_t queue_num = ntohs(netlink_pointer_to_data->res_id);
@@ -225,26 +224,26 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
                 //Extrage ID-ul pachetului (NECESAR pentru verdict!)
                 struct nfqnl_msg_packet_hdr *ph = (struct nfqnl_msg_packet_hdr *)nla_data(attribut);
                 packet_info.packet_id = ntohl(ph->packet_id);
-                printf("Packet ID: %u\n", packet_info.packet_id);
+                // printf("Packet ID: %u\n", packet_info.packet_id);
                 break;
             }
             case NFQA_PAYLOAD: {
                 //Extrage payload-ul (pachetul IP efectiv)
                 packet_info.ip_packet = (unsigned char *)nla_data(attribut);
                 packet_info.ip_len = NLA_PAYLOAD(attribut);
-                printf("Payload: %d bytes\n", packet_info.ip_len);
+                // printf("Payload: %d bytes\n", packet_info.ip_len);
                 break;
             }
             case NFQA_IFINDEX_INDEV: {
                 //Interfata de intrare
                 in_ifindex = (uint32_t *)nla_data(attribut);
-                printf("Interface IN: %u\n", ntohl(*in_ifindex));
+                // printf("Interface IN: %u\n", ntohl(*in_ifindex));
                 break;
             }
             case NFQA_IFINDEX_OUTDEV: {
                 //Interfata de iesire
                 out_ifindex = (uint32_t *)nla_data(attribut);
-                printf("Interface OUT: %u\n", ntohl(*out_ifindex));
+                // printf("Interface OUT: %u\n", ntohl(*out_ifindex));
                 break;
             } 
         }
@@ -266,13 +265,13 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     packet_info.data.src_ip = iph->saddr;
     packet_info.data.dst_ip = iph->daddr;
     packet_info.data.protocol = iph->protocol;
-    //TODO: Functie pt extragere port pe baza protocolului exista librarii in C pt TCP si UDP
+    //TODO:Functie pt extragere port pe baza protocolului exista librarii in C pt TCP si UDP
     packet_info.data.dst_port = 0x00000001;             //dummmy pt port    
     packet_info.data.message_id = counter_temp;
 
     uint32_t result;
     
-    //TODO:logica de filtrare aici
+    //logica de filtrare aici
     if(queue_num == QUEUE_OUTBOUND){
         result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
         printf("RESULT FROM DMA: %d\n",result);
@@ -281,10 +280,14 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
         printf("RESULT FROM INTERNET: %d\n",result);
     }
 
+
+
     //NF_ACCEPT (1) NF_DROP (0)
     uint32_t verdict = NF_DROP;
     if(result == VALID_RESPONSE){
         verdict = NF_ACCEPT;
+    }else{
+        build_json(result);
     }
     
     if(send_verdict(netlink_socket, packet_info.packet_id, verdict, queue_num) < 0){
@@ -298,7 +301,7 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
 
 
 void recive_netlink_packet(int netlink_socket){
-     char buffer[8192];                                                 //buffer pt pachet
+    char buffer[8192];                                                 //buffer pt pachet
 
     struct sockaddr_nl sa;                                              //pid la kernel
     struct iovec iov = {                                                //pt scatter gather I/O (descrie zona de mem)
@@ -319,14 +322,16 @@ void recive_netlink_packet(int netlink_socket){
 
     // int flags = fcntl(netlink_socket, F_GETFL, 0);
     // fcntl(netlink_socket, F_SETFL, flags | O_NONBLOCK);                 //Pt a fi non-blocking
-
+    
     ssize_t size = recvmsg(netlink_socket, &msg, 0);                    //folosit pentru a primi mesaje din socket, buffer e locatia unde se copie mesajele
     if(size <= 0) return;
+    // printf("before for loop\n");
   
     struct nlmsghdr *nlh;                                               //header la netlink                                             
     //NLMSG_OK verifica daca nu e truncat mesajul si e potrivit pentru parsare
     //NLMSG_NEXT obtine uratorul nlh intr-un multipart message
     for(nlh = (struct nlmsghdr *)buffer; NLMSG_OK(nlh, size); nlh = NLMSG_NEXT(nlh, size)){
+        // printf("in for loop\n");
         if(nlh->nlmsg_type == NLMSG_DONE){ 
             return;
         }
