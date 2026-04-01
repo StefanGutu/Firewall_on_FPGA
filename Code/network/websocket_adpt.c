@@ -15,7 +15,7 @@ static struct lws_protocols protocols[] = {
 
 message_queue_t queue = {0};
 struct lws_context *global_context = NULL;
-pthread_mutex_t queue_mutex = PTHREAD_MUTEX_INITIALIZER; //
+pthread_mutex_t queue_mutex = PTHREAD_MUTEX_INITIALIZER; 
 
 struct lws_context *init_server(){
     struct lws_context_creation_info info = {0};
@@ -63,7 +63,7 @@ int send_json(struct lws *wsi, const char *json, int len){
 int ws_callback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len){
     switch(reason){
         case LWS_CALLBACK_ESTABLISHED:
-            printf("Client conectat\n");
+            printf("Client connected\n");
             break;
 
         case LWS_CALLBACK_SERVER_WRITEABLE:
@@ -83,7 +83,7 @@ int ws_callback(struct lws *wsi, enum lws_callback_reasons reason, void *user, v
             break;
 
         case LWS_CALLBACK_CLOSED:
-            printf("Client deconectat\n");
+            printf("Client disconected\n");
             break;
 
         default:

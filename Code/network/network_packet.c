@@ -262,21 +262,31 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     // printf("Destination IP: %s\n", inet_ntoa(*(struct in_addr *)&iph->daddr));
     // printf("Protocol: %u\n", iph->protocol);
 
-    packet_info.data.src_ip = iph->saddr;
-    packet_info.data.dst_ip = iph->daddr;
+
     packet_info.data.protocol = iph->protocol;
     //TODO:Functie pt extragere port pe baza protocolului exista librarii in C pt TCP si UDP
     packet_info.data.dst_port = 0x00000001;             //dummmy pt port    
     packet_info.data.message_id = counter_temp;
-
     uint32_t result;
     
     //logica de filtrare aici
     if(queue_num == QUEUE_OUTBOUND){
+        packet_info.data.src_ip = iph->saddr;
+        packet_info.data.dst_ip = iph->daddr;
+
         result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
+        if(result == VALID_RESPONSE){
+            result = verfiy_ip(packet_info.data.src_ip, ntohl(*in_ifindex), socket_ip_spoofing);
+        }
         printf("RESULT FROM DMA: %d\n",result);
     }else if(queue_num == QUEUE_INBOUND){
-        result = verfiy_ip(packet_info.data.src_ip, ntohl(*in_ifindex), socket_ip_spoofing);
+        packet_info.data.src_ip = iph->daddr;
+        packet_info.data.dst_ip = iph->saddr;
+
+        result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
+        if(result == VALID_RESPONSE){
+            result = verfiy_ip(packet_info.data.dst_ip, ntohl(*in_ifindex), socket_ip_spoofing);
+        }
         printf("RESULT FROM INTERNET: %d\n",result);
     }
 

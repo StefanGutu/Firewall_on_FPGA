@@ -140,8 +140,13 @@ int search_table(arp_elem_t new_elem){
 }
 
 int check_arp_table(int socket){
+    int search_table_val = 0;
     message_type_t message;
     arp_elem_t new_elem;
+
+    char cmd[128];
+    char ip_str[INET_ADDRSTRLEN];
+    char mac_str[32];
 
     ssize_t len = recv(socket, &message, sizeof(message), 0);
     if(len < 0){
@@ -151,7 +156,7 @@ int check_arp_table(int socket){
 
     
     if(ntohs(message.arp_payload.opcode) == 2){
-        printf("OPCODE: %d\n", ntohs(message.arp_payload.opcode));
+        // printf("OPCODE: %d\n", ntohs(message.arp_payload.opcode));
 
         memcpy(new_elem.mac, message.arp_payload.src_mac, 6);
         new_elem.ip = message.arp_payload.src_ip;
@@ -159,23 +164,14 @@ int check_arp_table(int socket){
         new_elem.change_counter = 0;
         new_elem.trust = 0;
 
-        if(search_table(new_elem) == ARP_DETECT_NOTHING){
+        search_table_val = search_table(new_elem);
+
+        if(search_table_val == ARP_DETECT_NOTHING){
             add_in_arp_table(new_elem);
             // print_arp_struct(new_elem);
         }else{
             if(in_blacklist(new_elem) == 0){
-
-                char cmd[128];
-                char ip_str[INET_ADDRSTRLEN];
-
-                inet_ntop(AF_INET, &new_elem.ip, ip_str, sizeof(ip_str));
-                snprintf(cmd, sizeof(cmd), "ebtables -A INPUT -p ARP --arp-ip-src %s -j DROP", ip_str);
-                int ret = system(cmd);
-                if(ret != 0){
-                    printf("ERROR: ebtables command failed with code %d\n", ret);
-                }
-                
-                printf("[SECURITY] ARP BLOCKED FOR IP: %s\n", ip_str);
+                // printf("[SECURITY] ARP BLOCKED FOR IP: %s\n", ip_str);
 
                 if(counter_black_list >= MAX_BLACK_LIST){
                     printf("ERROR: blacklist full\n");
@@ -184,12 +180,34 @@ int check_arp_table(int socket){
                 
                 black_list_arp_table[counter_black_list] = new_elem;
                 counter_black_list++;
+                
+                
+                inet_ntop(AF_INET, &new_elem.ip, ip_str, sizeof(ip_str));
+                snprintf(cmd, sizeof(cmd), "ebtables -L INPUT | grep -q 'arp-ip-src %s'", ip_str);
+                if (system(cmd) != 0) {
+                    snprintf(cmd, sizeof(cmd), "ebtables -A INPUT -p ARP --arp-ip-src %s -j DROP", ip_str);
+                    int ret = system(cmd);
+                    if (ret != 0) {
+                        printf("ERROR: ebtables ARP block failed\n");
+                    }
+                }
+                
+                snprintf(mac_str, sizeof(mac_str), "%02x:%02x:%02x:%02x:%02x:%02x", new_elem.mac[0], new_elem.mac[1], new_elem.mac[2], new_elem.mac[3], new_elem.mac[4], new_elem.mac[5]);
+                snprintf(cmd, sizeof(cmd), "ebtables -L INPUT | grep -q '%s'", mac_str);
+                if (system(cmd) != 0) {
+                    snprintf(cmd, sizeof(cmd), "ebtables -A INPUT --src %s -j DROP", mac_str);
+                    int ret = system(cmd);
+                    if (ret != 0) {
+                        printf("ERROR: ebtables MAC block failed\n");
+                    }
+                }
             }
+            search_table_val = 5;
         }
 
     }
 
-    return 0;
+    return search_table_val;
 }
 
 
