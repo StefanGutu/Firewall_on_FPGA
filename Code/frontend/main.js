@@ -18,6 +18,7 @@ let total    = 0;
 let logCount = 0;
 let ws       = null;
 
+/* ── PIE CHART ── */
 const pieCtx = document.getElementById('pieChart').getContext('2d');
 const pieChart = new Chart(pieCtx, {
     type: 'doughnut',
@@ -41,7 +42,7 @@ const pieChart = new Chart(pieCtx, {
                 labels: {
                     color: '#8aa0b0',
                     font: { family: 'Share Tech Mono', size: 10 },
-                    padding: 14,
+                    padding: 12,
                     usePointStyle: true,
                 }
             },
@@ -58,28 +59,18 @@ const pieChart = new Chart(pieCtx, {
     }
 });
 
-function updateTopStats() {
-    document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-pkt').textContent = counts[2];
-    document.getElementById('stat-ip').textContent  = counts[4];
-    document.getElementById('stat-arp').textContent = counts[5];
-}
-
 function updatePie() {
     pieChart.data.datasets[0].data = [counts[5], counts[4], counts[2]];
     pieChart.update();
-    document.getElementById('total-badge').textContent = 'TOTAL: ' + total;
-    updateTopStats();
+    document.getElementById('total-badge').textContent  = 'TOTAL: ' + total;
+    document.getElementById('stat-total').textContent   = total;
+    document.getElementById('stat-pkt').textContent     = counts[2];
+    document.getElementById('stat-ip').textContent      = counts[4];
+    document.getElementById('stat-arp').textContent     = counts[5];
 }
 
 function now() {
     return new Date().toLocaleTimeString('en-US', { hour12: false });
-}
-
-function startClock() {
-    setInterval(() => {
-        document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US', { hour12: false });
-    }, 1000);
 }
 
 function setConnectionStatus(s) {
@@ -96,7 +87,6 @@ function addLog(attackType, extraMsg) {
     const div  = document.createElement('div');
 
     let cssClass, typeName, msg;
-
     if (attackType === 0) {
         cssClass = 'info';
         typeName = 'SYSTEM';
@@ -115,7 +105,9 @@ function addLog(attackType, extraMsg) {
         '<span class="log-msg">' + msg + '</span>';
 
     body.prepend(div);
-    if (body.children.length > 200) body.removeChild(body.lastChild);
+
+    // cap at 30 entries
+    while (body.children.length > 30) body.removeChild(body.lastChild);
 }
 
 function handleAttack(attackType) {
@@ -128,15 +120,14 @@ function handleAttack(attackType) {
 function resetStats() {
     counts[2] = 0; counts[4] = 0; counts[5] = 0;
     total = 0; logCount = 0;
-
     document.getElementById('log-body').innerHTML = '';
     document.getElementById('log-count').textContent = '0 EVT';
-
     updatePie();
     logCount = 0;
     addLog(0, 'Statistics reset');
 }
 
+/* ── WEBSOCKET ── */
 function connectWS() {
     const url = 'ws://' + document.getElementById('ws-url').value.trim();
     addLog(0, 'Connecting to ' + url + '...');
@@ -181,5 +172,4 @@ function disconnectWS() {
     if (ws) { ws.close(); ws = null; }
 }
 
-startClock();
 addLog(0, 'Dashboard initialized. Waiting for WebSocket connection.');

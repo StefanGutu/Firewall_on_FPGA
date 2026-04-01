@@ -16,11 +16,14 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
+html, body {
+    height: 100%;
+    overflow: hidden;
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-mono);
-    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 body::before {
@@ -31,62 +34,53 @@ body::before {
     z-index: 1000;
 }
 
+/* ── HEADER ── */
 header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 28px;
+    padding: 12px 24px;
     border-bottom: 1px solid var(--border);
     background: var(--surface);
+    flex-shrink: 0;
 }
 
-.logo { display: flex; align-items: center; gap: 14px; }
-
-.shield {
-    width: 34px; height: 34px;
-    color: var(--red);
-    filter: drop-shadow(0 0 6px var(--red));
-    animation: pulse-shield 2s infinite;
-}
-@keyframes pulse-shield {
-    0%,100% { filter: drop-shadow(0 0 6px var(--red)); }
-    50%      { filter: drop-shadow(0 0 16px var(--red)); }
-}
+.logo { display: flex; align-items: baseline; gap: 16px; }
 
 .logo h1 {
     font-family: var(--font-display);
-    font-size: 16px; font-weight: 900;
+    font-size: 15px; font-weight: 900;
     letter-spacing: 0.15em; color: var(--white);
 }
-.logo p { font-size: 9px; color: var(--dim); letter-spacing: 0.2em; margin-top: 2px; }
+.logo p { font-size: 9px; color: var(--dim); letter-spacing: 0.2em; }
 
-.header-right { display: flex; align-items: center; gap: 20px; font-size: 11px; }
+.header-right { display: flex; align-items: center; }
 
-.dot-wrap { display: flex; align-items: center; gap: 6px; color: var(--dim); }
+.dot-wrap { display: flex; align-items: center; gap: 6px; color: var(--dim); font-size: 11px; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); transition: background 0.3s, box-shadow 0.3s; }
 .dot.connected    { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 1.5s infinite; }
 .dot.error        { background: var(--red);   box-shadow: 0 0 8px var(--red); }
 .dot.disconnected { background: var(--dim); animation: none; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-#clock { color: var(--cyan); letter-spacing: 0.1em; }
-
+/* ── CONFIG BAR ── */
 .ws-config {
     display: flex; align-items: center; gap: 8px;
-    padding: 10px 28px;
+    padding: 8px 24px;
     border-bottom: 1px solid var(--border);
     background: var(--surface);
+    flex-shrink: 0;
 }
 .ws-config label { font-size: 11px; color: var(--dim); }
 .ws-config input {
-    flex: 1; max-width: 260px;
+    flex: 1; max-width: 240px;
     background: var(--bg); border: 1px solid var(--border);
-    color: var(--cyan); font-family: var(--font-mono); font-size: 12px;
-    padding: 5px 10px; outline: none;
+    color: var(--cyan); font-family: var(--font-mono); font-size: 11px;
+    padding: 4px 10px; outline: none;
 }
 .ws-config input:focus { border-color: var(--cyan); }
 
 .btn {
-    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
-    padding: 5px 12px; background: transparent;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+    padding: 4px 10px; background: transparent;
     border: 1px solid var(--cyan); color: var(--cyan);
     cursor: pointer; transition: all 0.2s;
 }
@@ -96,29 +90,31 @@ header {
 .btn-dim       { border-color: var(--dim); color: var(--dim); }
 .btn-dim:hover { background: var(--dim); color: var(--bg); }
 
+/* ── MAIN ── */
 main {
-    padding: 20px 28px;
-    height: calc(100vh - 110px);
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 12px 24px 12px;
+    gap: 12px;
+    overflow: hidden;
 }
 
+/* ── STAT CARDS ── */
 .stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 10px;
     flex-shrink: 0;
 }
 
 .stat-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-top: 3px solid var(--cyan);
-    padding: 14px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    border-top: 2px solid var(--cyan);
+    padding: 10px 16px;
+    display: flex; flex-direction: column; gap: 4px;
 }
 .stat-card.pkt-card { border-top-color: var(--yellow); }
 .stat-card.ip-card  { border-top-color: var(--orange); }
@@ -126,101 +122,77 @@ main {
 
 .stat-title {
     font-family: var(--font-display);
-    font-size: 10px;
-    color: var(--text);
-    font-weight: 700;
-    letter-spacing: 0.1em;
+    font-size: 8px; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--text);
 }
-
-.stat-val {
-    font-size: 26px;
-    color: var(--cyan);
-}
+.stat-val { font-size: 22px; color: var(--cyan); line-height: 1; }
 .stat-card.pkt-card .stat-val { color: var(--yellow); }
-.stat-card.ip-card .stat-val  { color: var(--orange); }
+.stat-card.ip-card  .stat-val { color: var(--orange); }
 .stat-card.arp-card .stat-val { color: var(--red); }
 
+/* ── PIE + LOG ROW ── */
+/* height:0 + flex:1 este pattern-ul corect pentru ca un grid item
+   sa respecte spatiul flex ramas fara sa il depaseasca */
 .content-row {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: 16px;
+    gap: 12px;
     flex: 1;
     min-height: 0;
+    height: 0;
 }
 
-.chart-card {
+.chart-card, .log-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
+    padding: 14px 16px;
+    display: flex; flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .card-header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     flex-shrink: 0;
 }
 .card-title {
     font-family: var(--font-display);
-    font-size: 10px; font-weight: 700;
+    font-size: 9px; font-weight: 700;
     letter-spacing: 0.1em; color: var(--white);
 }
 .card-badge {
-    font-size: 10px; color: var(--red);
-    border: 1px solid var(--red); padding: 1px 7px;
+    font-size: 9px; color: var(--red);
+    border: 1px solid var(--red); padding: 1px 6px;
     letter-spacing: 0.1em;
 }
 
 .pie-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 0;
+    flex: 1; min-height: 0;
+    display: flex; align-items: center; justify-content: center;
 }
+.pie-wrap canvas { max-width: 100%; max-height: 100%; }
 
-.pie-wrap canvas {
-    max-width: 100%;
-    max-height: 100%;
-}
-
-.log-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-}
-
+/* ── LOG ── */
 .log-body {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    font-size: 11px;
+    font-size: 13px;
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
-    min-height: 0;
 }
 
 .log-line {
-    padding: 4px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
     display: flex; align-items: center; gap: 10px;
 }
 .log-ts   { color: var(--dim); min-width: 80px; flex-shrink: 0; }
-.log-type { min-width: 130px; font-weight: bold; flex-shrink: 0; }
+.log-type { min-width: 140px; font-weight: bold; flex-shrink: 0; }
 .log-msg  { color: var(--text); }
 
 .log-line.arp  .log-type { color: var(--red); }
 .log-line.ip   .log-type { color: var(--orange); }
 .log-line.pkt  .log-type { color: var(--yellow); }
 .log-line.info .log-type { color: var(--cyan); }
-
-@media (max-width: 900px) {
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 700px) {
-    .content-row { grid-template-columns: 1fr; }
-    main { height: auto; }
-}
