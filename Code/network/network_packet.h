@@ -11,8 +11,8 @@
 
 #include <sys/socket.h>
 #include <linux/netlink.h>
-#include <linux/ip.h> 
-#include <netinet/tcp.h>
+#include <linux/tcp.h> 
+#include <netinet/ip.h>   
 #include <netinet/udp.h>
 #include <fcntl.h> 
 

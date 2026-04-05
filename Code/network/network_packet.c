@@ -263,16 +263,36 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     // printf("Protocol: %u\n", iph->protocol);
 
 
-    packet_info.data.protocol = iph->protocol;
-    //TODO:Functie pt extragere port pe baza protocolului exista librarii in C pt TCP si UDP
-    packet_info.data.dst_port = 0x00000001;             //dummmy pt port    
-    packet_info.data.message_id = counter_temp;
     uint32_t result;
+    packet_info.data.message_id = counter_temp;
+    packet_info.data.protocol = iph->protocol;
+
+    int temp_port_src, temp_port_dst;
+    
+    if(iph->protocol == IPPROTO_TCP){
+        struct tcphdr *tcph = (struct tcphdr *)((uint8_t *)iph + (iph->ihl * 4));
+        temp_port_dst = ntohs(tcph->dest);
+        temp_port_src = ntohs(tcph->source);
+    }else if(iph->protocol == IPPROTO_UDP){
+        struct udphdr *udph = (struct udphdr *)((uint8_t *)iph + (iph->ihl * 4));
+        temp_port_dst = ntohs(udph->dest);
+        temp_port_src = ntohs(udph->source);
+    }else if(iph->protocol == IPPROTO_ICMP){
+        temp_port_dst = 1;
+        temp_port_src = 1;
+    }
+    else{
+        send_verdict(netlink_socket, packet_info.packet_id, NF_DROP, queue_num);
+        return;
+    }
+    // printf("PORT DST: %d\n", temp_port_dst);
+    // printf("PORT SRC: %d\n", temp_port_src);      
     
     //logica de filtrare aici
     if(queue_num == QUEUE_OUTBOUND){
         packet_info.data.src_ip = iph->saddr;
         packet_info.data.dst_ip = iph->daddr;
+        packet_info.data.dst_port = temp_port_dst;  
 
         result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
         if(result == VALID_RESPONSE){
@@ -282,6 +302,7 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     }else if(queue_num == QUEUE_INBOUND){
         packet_info.data.src_ip = iph->daddr;
         packet_info.data.dst_ip = iph->saddr;
+        packet_info.data.dst_port = temp_port_src; 
 
         result = send_data_to_dma(packet_info.data) & MASK_FEEDBACK;
         if(result == VALID_RESPONSE){
@@ -303,7 +324,7 @@ void atribute_netlink_packet(int netlink_socket, struct nlmsghdr *netlink_header
     if(send_verdict(netlink_socket, packet_info.packet_id, verdict, queue_num) < 0){
         printf("ERROR: Problem in atribute function send_verdict line\n");
     }else{
-        printf("SUCCES: Verdict: %s\n", verdict == NF_ACCEPT ? "ACCEPT" : "DROP");
+        printf("Verdict: %s\n", verdict == NF_ACCEPT ? "ACCEPT" : "DROP");
     }
     counter_temp++;
 }
