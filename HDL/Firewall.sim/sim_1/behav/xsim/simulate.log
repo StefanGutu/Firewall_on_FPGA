@@ -1,0 +1,44 @@
+Time resolution is 1 ps
+Block Memory Generator module design_1_wrapper.design_1_i.blk_mem_gen_0.inst.native_mem_mapped_module.blk_mem_gen_v8_4_11_inst is using a behavioral model for simulation which will not precisely model memory collision behavior.
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.M_AXI_GP0.master
+[0] : *ZYNQ_VIP_INFO : M_AXI_GP0 : Port is ENABLED.
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.M_AXI_GP1.master
+[0] : *ZYNQ_VIP_INFO : M_AXI_GP1 : Port is DISABLED.
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.S_AXI_GP0.slave
+[0] : *ZYNQ_VIP_INFO : S_AXI_GP0 : Port is ENABLED.
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.S_AXI_GP1.slave
+[0] : *ZYNQ_VIP_INFO : S_AXI_GP1 : Port is DISABLED.
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.S_AXI_HP0.slave
+[0] : *ZYNQ_VIP_INFO : S_AXI_HP0 : Port is ENABLED.
+                   0 BEFORE checking line ...... x
+                   0 AFTER checking line ...... x
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.S_AXI_HP1.slave
+[0] : *ZYNQ_VIP_INFO : S_AXI_HP1 : Port is DISABLED.
+                   0 BEFORE checking line ...... x
+                   0 AFTER checking line ...... x
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.S_AXI_HP2.slave
+[0] : *ZYNQ_VIP_INFO : S_AXI_HP2 : Port is DISABLED.
+                   0 BEFORE checking line ...... x
+                   0 AFTER checking line ...... x
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.S_AXI_HP3.slave
+[0] : *ZYNQ_VIP_INFO : S_AXI_HP3 : Port is DISABLED.
+                   0 BEFORE checking line ...... x
+                   0 AFTER checking line ...... x
+XilinxAXIVIP: Found at Path: design_1_wrapper.design_1_i.processing_system7_0.inst.S_AXI_ACP.slave
+[0] : *ZYNQ_VIP_INFO : S_AXI_ACP : Port is DISABLED.
+                   0 else checking line ......x
+Info: [XPM_FIFO_AXIS 21-1] Almost full flag option is not enabled (USE_ADV_FEATURES[3] = 0) but Packet FIFO mode requires almost_full to be enabled. XPM_FIFO_AXIS enables the Almost full flag automatically. You may ignore almost_full port if not required design_1_wrapper.design_1_i.axi_fifo_mm_s_0.U0.COMP_IPIC2AXI_S.gtxd.COMP_TXD_FIFO.gfifo_gen.COMP_AXIS_FG_FIFO.COMP_FIFO.config_drc_axis
+Time: 1 ps  Iteration: 0  Process: /design_1_wrapper/design_1_i/axi_fifo_mm_s_0/U0/COMP_IPIC2AXI_S/gtxd/COMP_TXD_FIFO/gfifo_gen/COMP_AXIS_FG_FIFO/COMP_FIFO/Initial2554_509  Scope: design_1_wrapper.design_1_i.axi_fifo_mm_s_0.U0.COMP_IPIC2AXI_S.gtxd.COMP_TXD_FIFO.gfifo_gen.COMP_AXIS_FG_FIFO.COMP_FIFO.config_drc_axis  File: /home/paxl/InstalledTools/Vivado/2025.1/2025.1/Vivado/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv Line: 2596
+Info: [XPM_FIFO_AXIS 21-1] Almost empty flag option is not enabled (USE_ADV_FEATURES[11] = 0) but Packet FIFO mode requires almost_empty to be enabled. XPM_FIFO_AXIS enables the Almost empty flag automatically. You may ignore almost_empty port if not required design_1_wrapper.design_1_i.axi_fifo_mm_s_0.U0.COMP_IPIC2AXI_S.gtxd.COMP_TXD_FIFO.gfifo_gen.COMP_AXIS_FG_FIFO.COMP_FIFO.config_drc_axis
+Time: 1 ps  Iteration: 0  Process: /design_1_wrapper/design_1_i/axi_fifo_mm_s_0/U0/COMP_IPIC2AXI_S/gtxd/COMP_TXD_FIFO/gfifo_gen/COMP_AXIS_FG_FIFO/COMP_FIFO/Initial2554_509  Scope: design_1_wrapper.design_1_i.axi_fifo_mm_s_0.U0.COMP_IPIC2AXI_S.gtxd.COMP_TXD_FIFO.gfifo_gen.COMP_AXIS_FG_FIFO.COMP_FIFO.config_drc_axis  File: /home/paxl/InstalledTools/Vivado/2025.1/2025.1/Vivado/data/ip/xpm/xpm_fifo/hdl/xpm_fifo.sv Line: 2599
+WARNING: 5 ns design_1_wrapper.design_1_i.processing_system7_0.inst.M_AXI_GP0.master.IF : ARESET_N can't be X/Z after 1 cycle of clock. To downgrade, use <hierarchy_path to VIP>.IF.set_enable_xchecks_to_warn(), or filter using clr_enable_xchecks.
+                   5 else checking line ......1
+Executing Axi4 End Of Simulation checks
+Executing Axi4 End Of Simulation checks
+Executing Axi4 End Of Simulation checks
+Executing Axi4 End Of Simulation checks
+Executing Axi4 End Of Simulation checks
+Executing Axi4 End Of Simulation checks
+Executing Axi4 End Of Simulation checks
+Executing Axi4 End Of Simulation checks
+Executing Axi4 End Of Simulation checks
