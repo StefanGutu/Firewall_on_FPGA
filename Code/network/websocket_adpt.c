@@ -41,6 +41,7 @@ void push_event(const char *msg){
 
     //notificam libwebsockets ca avem date noi 
     if (global_context) {
+        printf("Message push_event: %s\n", msg);
         lws_callback_on_writable_all_protocol(global_context, &protocols[0]);
         lws_cancel_service(global_context); 
     }
@@ -56,6 +57,7 @@ int build_json(int attack_type){
 int send_json(struct lws *wsi, const char *json, int len){
     unsigned char buf[LWS_PRE + 256];
     unsigned char *p = &buf[LWS_PRE];
+    printf("mesaj %s\n", json);
     memcpy(p, json, len);
     return lws_write(wsi, p, len, LWS_WRITE_TEXT);
 }
@@ -70,6 +72,7 @@ int ws_callback(struct lws *wsi, enum lws_callback_reasons reason, void *user, v
             pthread_mutex_lock(&queue_mutex); //blocam pentru citire sigura
             if (queue.count > 0) {
                 char *msg = queue.messages[queue.tail];
+
                 send_json(wsi, msg, strlen(msg));
                 queue.tail = (queue.tail + 1) % 64;
                 queue.count--;

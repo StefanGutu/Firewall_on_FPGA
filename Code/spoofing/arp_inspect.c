@@ -113,17 +113,16 @@ int search_table(arp_elem_t new_elem){
     for(int i = 0; i < counter_arp_table; i++){
         if((new_elem.ip == arp_table[i].ip) && (arp_table[i].trust == 1) && (memcmp(new_elem.mac, arp_table[i].mac, 6) != 0)){
             return ARP_DETECT_TRUST_BROKEN_MAC;
-        }else if((new_elem.ip == arp_table[i].ip) && (arp_table[i].trust == 0) && (memcmp(new_elem.mac, arp_table[i].mac, 6) != 0)){
-            
+        }else if((new_elem.ip == arp_table[i].ip) && (arp_table[i].trust == 0) && (memcmp(new_elem.mac, arp_table[i].mac, 6) != 0)) {
+
+            if(arp_table[i].change_counter >= MAX_CHANGES_MAC) {
+                return ARP_DETECT_MAX_CHANGE;
+            }
+
             memcpy(arp_table[i].mac, new_elem.mac, 6);
             arp_table[i].change_counter++;
             arp_table[i].last_seen = new_elem.last_seen;
-
             return ARP_DETECT_PRESENT_ELEM;
-        }else if((new_elem.ip == arp_table[i].ip) && (arp_table[i].trust == 0)){
-            if(arp_table[i].change_counter >= MAX_CHANGES_MAC){
-                return ARP_DETECT_MAX_CHANGE;
-            }
         }
 
         if(memcmp(new_elem.mac, arp_table[i].mac, 6) == 0 && new_elem.ip != arp_table[i].ip){
@@ -169,6 +168,11 @@ int check_arp_table(int socket){
         if(search_table_val == ARP_DETECT_NOTHING){
             add_in_arp_table(new_elem);
             // print_arp_struct(new_elem);
+        }else if(search_table_val == ARP_DETECT_PRESENT_ELEM) {
+
+            inet_ntop(AF_INET, &new_elem.ip, ip_str, sizeof(ip_str));
+            printf("WARNING: MAC change for %s\n", ip_str);
+
         }else{
             if(in_blacklist(new_elem) == 0){
                 // printf("[SECURITY] ARP BLOCKED FOR IP: %s\n", ip_str);

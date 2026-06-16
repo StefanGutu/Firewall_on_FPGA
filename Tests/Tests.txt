@@ -1,0 +1,7 @@
+Exista 3 tipuri de teste ce pot fi facute:
+
+1. Pentru a verifica daca un pachet e acceptat sau nu sa treaca prin firewall putem utiliza comanda ping astfel o sa determinam in consola daca acesta poate trece sau nu
+
+2. Arp_Test.c care reprezinta cateva exemple de test de verificare a modului ARP pentru anti spoofing
+
+3. IP_Test.c care reprezinta cateva exemple de test pentru a verifica modul de functionare IP anti spoofing
