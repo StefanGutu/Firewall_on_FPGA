@@ -4,7 +4,7 @@ Un firewall implementat pe placa FPGA Arty Z7-20 cu PetaLinux.
 
 ---
 
-## Rularea firewall-ului (din imaginea de pe FirewallExample)
+## Rularea firewall-ului (cu imaginea de pe FirewallExample)
 
 ### Cerințe prealabile
 
