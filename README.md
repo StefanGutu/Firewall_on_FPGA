@@ -16,7 +16,7 @@ Un firewall implementat pe placa FPGA Arty Z7-20 cu PetaLinux.
 
 ---
 
-### Pasul 1 — Scrierea imaginii pe cardul SD
+### Pasul 1: Scrierea imaginii pe cardul SD
 
 După ce ai obținut imaginea `FirewallExample`, scrie-o pe cardul SD (exemplu mai jos):
 
@@ -28,7 +28,7 @@ sudo dd if=petalinux-sdimage.wic of=/dev/sdc bs=4M conv=fsync status=progress
 
 ---
 
-### Pasul 2 — Pornirea plăcii și deschiderea unui terminal serial
+### Pasul 2: Pornirea plăcii și deschiderea unui terminal serial
 
 Introdu SD cardul în Arty Z7-20, conectează placa prin USB, apoi deschide un terminal pe calculatorul tău:
 
@@ -38,7 +38,7 @@ screen -h 5000 /dev/ttyUSB1 115200
 
 ---
 
-### Pasul 3 — (Opțional) Deschiderea Hardware Manager în Vivado
+### Pasul 3: (Opțional) Deschiderea Hardware Manager în Vivado
 
 Dacă dorești să inspectezi hardware-ul cu Hardware Manager din Vivado:
 
@@ -51,7 +51,7 @@ Dacă nu ai nevoie de analiza hardware, lasă placa să booteze normal.
 
 ---
 
-### Pasul 4 — Autentificarea pe placă
+### Pasul 4: Autentificarea pe placă
 
 Credențiale implicite setate în build-ul PetaLinux:
 
@@ -61,7 +61,7 @@ Parolă:     setată la prima autentificare (vei fi solicitat să creezi una)
 
 ---
 
-### Pasul 5 — Setarea adresei IP pe FPGA
+### Pasul 5: Setarea adresei IP pe FPGA
 
 Atribuie o adresă IP statică interfeței care este conectată la laptop :
 
@@ -72,7 +72,7 @@ sudo ip addr add 192.168.1.20/24 dev <interfata_laptop>
 
 ---
 
-### Pasul 6 — Conectarea fizică a echipamentelor
+### Pasul 6: Conectarea fizică a echipamentelor
 
 Conectează totul astfel încât FPGA-ul să se afle **între internet și laptopul tău**:
 
@@ -84,7 +84,7 @@ Ambele interfețe trebuie să fie active.
 
 ---
 
-### Pasul 7 — Activarea rutării traficului și regulile de firewall pe FPGA
+### Pasul 7: Activarea rutării traficului și regulile de firewall pe FPGA
 
 Rulează următoarele comenzi pe FPGA (înlocuiește `eth_internet` și `eth_laptop` cu numele reale ale interfețelor):
 
@@ -106,7 +106,7 @@ sudo iptables -I FORWARD -i eth_internet -o eth_laptop -j NFQUEUE --queue-num 1
 
 ---
 
-### Pasul 8 — Compilarea și rularea aplicației firewall
+### Pasul 8: Compilarea și rularea aplicației firewall
 
 Navighează în directorul proiectului pe FPGA și compilează:
 
@@ -119,7 +119,7 @@ Apoi execută binarul compilat al firewall-ului.
 
 ---
 
-### Pasul 9 — Pornirea serverului frontend (pe laptopul tău)
+### Pasul 9: Pornirea serverului frontend (pe laptopul tău)
 
 De pe laptopul tău, navighează în folderul `frontend` al proiectului și pornește un server HTTP simplu:
 
