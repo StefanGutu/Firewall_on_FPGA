@@ -47,7 +47,7 @@ Dacă dorești să inspectezi hardware-ul cu Hardware Manager din Vivado:
 3. Conectează-te și încarcă sesiunea de analiză ILA / hardware după necesitate.
 4. Când ai terminat, scrie `boot` în terminal pentru a continua boot-ul.
 
-Dacă nu ai nevoie de analiza hardware, lasă placa să booteze normal.
+Dacă nu ai nevoie de analiza hardware, lasă să se booteze normal.
 
 ---
 
@@ -131,7 +131,7 @@ Deschide browserul și accesează `http://localhost:8080`. Pe măsură ce trafic
 
 ---
 
-##Toate comenzile
+### Toate comenzile
 
 ### Laptop
 
