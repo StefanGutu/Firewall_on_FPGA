@@ -131,7 +131,7 @@ Deschide browserul și accesează `http://localhost:8080`. Pe măsură ce trafic
 
 ---
 
-## Referință rapidă — toate comenzile
+##Toate comenzile
 
 ### Laptop
 
