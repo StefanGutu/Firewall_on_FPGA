@@ -63,7 +63,7 @@ Parolă:     setată la prima autentificare (vei fi solicitat să creezi una)
 
 ### Pasul 5: Setarea adresei IP
 
-Atribuie o adresă IP statică interfeței care este conectată la laptop :
+Atribuie o adresă IP statică interfeței care este conectată la laptop:
 
 ```bash
 # Adaugă adresa:
