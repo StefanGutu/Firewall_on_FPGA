@@ -1,7 +1,5 @@
 # Firewall cu detecție de spoofing implementat pe FPGA
 
-Link github: https://github.com/StefanGutu/Firewall_on_FPGA 
-
 Un firewall implementat pe platforma de dezvoltare Arty Z7-20. Acesta contine două subsisteme, unul software care se ocupă de procese complexe cum ar fi mecanismele de securitate, gestionarea pachetelor și controlul sistemului și subsistemul hardware care se ocupă de efectuarea filtrarii pe baza regulilor introduse de utilizator. Din perspectiva securității, sistemul oferă protecție împotriva atacurilor de tip IP spoofing și ARP spoofing, iar regulile de filtrare pot fi configurate dinamic în timpul funcționării. În plus, s-a dezvoltat o interfață web care comunică cu sistemul printr-un server WebSocket ca să permită monitorizarea evenimentelor detectate.
 
 ---
