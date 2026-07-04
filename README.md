@@ -1,6 +1,6 @@
-# Firewall pe FPGA
+# Firewall cu detecție de spoofing implementat pe FPGA 
 
-Un firewall implementat pe placa FPGA Arty Z7-20 cu PetaLinux.
+Un firewall implementat pe platforma de dezvoltare Arty Z7-20. Acesta contine doua subsisteme unul software care se ocupa de procese complexe cum ar fi mecanismele de securitate, gestionarea pachetelor si controlul sistemului si subsistemul hardware care se ocupa de efectuarea filtrarii pe baza regulilor introduse de utilizator. Din perspectiva securității, sistemul oferă protecție împotriva atacurilor de tip IP spoofing și ARP spoofing, iar regulile de filtrare pot fi configurate dinamic în timpul funcționării, această flexibilitate adaugă o creștere a latenței de 3 ms. In plus, s-a dezvoltat o interfata web care comunica cu sistemul printr-un server WebSocket ca sa permita monitorizarea evenimentelor detectate.
 
 ---
 
@@ -8,7 +8,7 @@ Un firewall implementat pe placa FPGA Arty Z7-20 cu PetaLinux.
 
 ### Cerințe prealabile
 
-- Placă FPGA Arty Z7-20
+- Arty Z7-20
 - Card microSD
 - 2 cabluri Ethernet
 - Modul Ethernet W5500 
@@ -30,7 +30,7 @@ sudo dd if=petalinux-sdimage.wic of=/dev/sdc bs=4M conv=fsync status=progress
 
 ### Pasul 2: Pornirea plăcii și deschiderea unui terminal serial
 
-Introdu SD cardul în Arty Z7-20, conectează placa prin USB, apoi deschide un terminal pe calculatorul tău:
+Introdu SD cardul în Arty Z7-20, conectează platforma de dezvoltare prin USB apoi deschide un terminal pe calculatorul tău:
 
 ```bash
 screen -h 5000 /dev/ttyUSB1 115200
@@ -51,7 +51,7 @@ Dacă nu ai nevoie de analiza hardware, lasă să se booteze normal.
 
 ---
 
-### Pasul 4: Autentificarea pe placă
+### Pasul 4: Autentificarea
 
 Credențiale implicite setate în build-ul PetaLinux:
 
@@ -61,7 +61,7 @@ Parolă:     setată la prima autentificare (vei fi solicitat să creezi una)
 
 ---
 
-### Pasul 5: Setarea adresei IP pe FPGA
+### Pasul 5: Setarea adresei IP
 
 Atribuie o adresă IP statică interfeței care este conectată la laptop :
 
@@ -74,7 +74,7 @@ sudo ip addr add 192.168.1.20/24 dev <interfata_laptop>
 
 ### Pasul 6: Conectarea fizică a echipamentelor
 
-Conectează totul astfel încât FPGA-ul să se afle **între internet și laptopul tău**:
+Conectează totul astfel încât platforma de dezvoltare să se afle **între internet și laptopul tău**:
 
 ```
 Internet (router) ──eth_internet──► FPGA ──eth_laptop──► Laptop
@@ -84,9 +84,9 @@ Ambele interfețe trebuie să fie active.
 
 ---
 
-### Pasul 7: Activarea rutării traficului și regulile de firewall pe FPGA
+### Pasul 7: Activarea rutării traficului și regulile de firewall
 
-Rulează următoarele comenzi pe FPGA (înlocuiește `eth_internet` și `eth_laptop` cu numele reale ale interfețelor):
+Rulează următoarele comenzi pe platforma de dezvoltare (înlocuiește `eth_internet` și `eth_laptop` cu numele reale ale interfețelor):
 
 ```bash
 # Activează IP forwarding
@@ -108,7 +108,7 @@ sudo iptables -I FORWARD -i eth_internet -o eth_laptop -j NFQUEUE --queue-num 1
 
 ### Pasul 8: Compilarea și rularea aplicației firewall
 
-Navighează în directorul proiectului pe FPGA și compilează:
+Navighează în directorul proiectului și compilează:
 
 ```bash
 cd <directorul-proiectului>
